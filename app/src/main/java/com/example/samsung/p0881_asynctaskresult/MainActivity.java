@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -80,13 +81,20 @@ public class MainActivity extends AppCompatActivity {
         try {
             String message = "Try to get result";
             Log.d(LOG_TAG, message);
-            result = myTask.get();
+            //Попытка получения результата без тайм-аута (подвешивает основной поток)
+            //result = myTask.get();
+            //Попытка получения результата с тайм-аутом (подвешивает основной поток)
+            result = myTask.get(1, TimeUnit.SECONDS);
             message = "Get returns " + result;
             Log.d(LOG_TAG, message);
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            //Если результат не получен за отведённое время, то:
+            Log.d(LOG_TAG, "Get with timeout, result = " + result);
             e.printStackTrace();
         }
     }
